@@ -3,7 +3,6 @@
 
 	export let data: PageData;
 
-	console.log({ data });
 	const today = new Date().toJSON().split('T')[0];
 </script>
 
@@ -13,7 +12,7 @@
 		<input type="hidden" name="id" value={data.id ?? null} />
 		<input type="hidden" name="code" value={data.fields.code} />
 		<input name="description" value={data.fields.description ?? ''} />
-		<input name="stored at" type="date" value={data.fields['stored at'] ?? today} />
+		<input name="stored" type="date" value={data.fields.stored ?? today} />
 		<button>Save</button>
 	</form>
 </main>

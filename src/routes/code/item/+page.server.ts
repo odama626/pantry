@@ -1,33 +1,32 @@
-import { airtable } from '$lib/server/db';
+import { db } from '$lib/server/db';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
 export const actions: Actions = {
-	edit: async ({ request }) => {
+	edit: async ({ request, locals }) => {
 		const data = await request.formData();
 
-		try {
-			console.log({ code: data.get('code') });
+		const items = db('items');
 
+		try {
 			const fields = {
 				code: data.get('code'),
 				description: data.get('description'),
-				'stored at': data.get('stored at')
+				stored: data.get('stored'),
+				household: locals?.token?.user?.household
 			};
 
 			const id = data.get('id');
 
-			console.log({ id });
-
 			if (id?.length) {
-				await airtable('items').update([
+				await items.update([
 					{
 						id: data.get('id'),
 						fields
 					}
 				]);
 			} else {
-				await airtable('items').create([
+				await items.create([
 					{
 						fields
 					}
