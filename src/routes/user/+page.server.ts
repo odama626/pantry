@@ -68,7 +68,7 @@ export const actions: Actions = {
 			requireFields({ email, password });
 
 			const user = await getUserByEmail(email);
-			if (!(await bcrypt.compare(password, user.fields.password))) throw new Error();
+			if (!(await bcrypt.compare(password, user.fields.password))) throw new Error('incorrect password');
 
 			if (!user.fields.invited) {
 				return fail(400, {
@@ -118,6 +118,5 @@ export const actions: Actions = {
 				error: { field: error?.field, message: error.message }
 			});
 		}
-		return handleLoginReturn(cookies);
 	}
 };
