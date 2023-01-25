@@ -4,38 +4,30 @@ import type { Actions } from './$types';
 
 export const actions: Actions = {
 	edit: async ({ request, locals }) => {
-		const data = await request.formData();
+		const formData = await request.formData();
+		const data = Object.fromEntries(formData.entries());
 
 		const items = db('items');
 
 		try {
 			const fields = {
-				code: data.get('code'),
-				description: data.get('description'),
-				stored: data.get('stored'),
+				code: data.code,
+				description: data.description,
+				stored: data.stored,
 				household: locals?.token?.user?.household
 			};
 
-			const id = data.get('id');
+			const id = data.id;
 
 			if (id?.length) {
-				await items.update([
-					{
-						id: data.get('id'),
-						fields
-					}
-				]);
+				await items.update([{ id: data.id, fields }]);
 			} else {
-				await items.create([
-					{
-						fields
-					}
-				]);
+				await items.create([{ fields }]);
 			}
 		} catch (e) {
 			console.error(e);
 			return fail(500, e.message);
 		}
-		throw redirect(303, `/code/item/${data.get('code')}`);
+		throw redirect(303, `/code/item/${data.code}`);
 	}
 };

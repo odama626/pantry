@@ -8,7 +8,7 @@ export class FieldError extends Error {
 
 export function requireFields(fields: Record<string, any>) {
 	Object.entries(fields).forEach(([field, value]) => {
-		if (value && value?.length) return;
+		if (value?.length) return;
 		throw new FieldError(field, 'This field is required');
 	});
 }

@@ -4,6 +4,7 @@
 	export let data: PageData;
 
 	const today = new Date().toJSON().split('T')[0];
+	let date = data.fields.stored ?? today;
 </script>
 
 <main class="container">
@@ -12,7 +13,17 @@
 		<input type="hidden" name="id" value={data.id ?? null} />
 		<input type="hidden" name="code" value={data.fields.code} />
 		<input name="description" value={data.fields.description ?? ''} />
-		<input name="stored" type="date" value={data.fields.stored ?? today} />
+		<div class="flex">
+			<input bind:value={date} name="stored" type="date" />
+			<button class="contrast outline" type="button" on:click={() => (date = today)}>Today</button>
+		</div>
 		<button>Save</button>
 	</form>
 </main>
+
+<style lang="scss">
+	.flex {
+		display: flex;
+		gap: 1rem;
+	}
+</style>

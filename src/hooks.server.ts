@@ -1,5 +1,4 @@
-import { db } from '$lib/server/db';
-import { redirect, type Handle, type Actions } from '@sveltejs/kit';
+import { type Handle } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 
 const safeRoutes = ['/', '/user'];
@@ -18,7 +17,8 @@ export const handle = (async ({ event, resolve }) => {
 					Location: `/user`,
 					'Set-Cookie': event.cookies.serialize(
 						import.meta.env.VITE_COOKIE_NAME + '_return',
-						event.url.pathname
+						event.url.pathname,
+						{ path: '/', httpOnly: true }
 					)
 				}
 			});
