@@ -8,7 +8,7 @@
 	}
 
 	const codesPromise = Promise.all(
-		Array(100)
+		Array(200)
 			.fill(0)
 			.map(() => createItemCode(nanoid()))
 	);

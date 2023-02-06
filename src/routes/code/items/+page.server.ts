@@ -1,24 +1,23 @@
 import type { PageServerLoad } from './$types';
 
-import { db } from '$lib/server/db';
-
-interface Item {}
+import { pb, prepareItemRecord } from '$lib/server/db';
 
 export const load = (async ({ params, locals }) => {
 	try {
-		let items: Item[] = [];
-		const { household } = locals?.token?.user ?? {};
+		let result = [];
+		const { household } = locals?.token?.user?.record ?? {};
 
 		if (household) {
-			items = await db('items')
-				.select({ filterByFormula: `{household} = '${locals?.token?.user?.household}'` })
-				.firstPage();
+			result = await pb.collection('items').getList(1, 500, {
+				sort: `-created`,
+				expand: 'tags'
+			});
 		}
 
 		return {
-			items: items.map((item) => item.fields)
+			items: await Promise.all(result.items.map(prepareItemRecord))
 		};
 	} catch (e) {
-		console.error(e);
+		console.dir(e, { depth: 5 });
 	}
 }) satisfies PageServerLoad;

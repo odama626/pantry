@@ -1,7 +1,6 @@
-import { db } from '$lib/server/db';
-import { FieldError, requireFields } from '$lib/server/forms';
+import { pb } from '$lib/server/db';
+import { requireFields } from '$lib/server/forms';
 import { fail, redirect } from '@sveltejs/kit';
-import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { escape } from 'lodash-es';
 import type { Actions, PageServerLoad } from './$types';
@@ -26,13 +25,6 @@ export const load = (async ({ params, cookies }) => {
 	return state;
 }) satisfies PageServerLoad;
 
-function getUserByEmail(email?: string) {
-	return db('users')
-		.select({ maxRecords: 1, filterByFormula: `{email} = '${email}'` })
-		.firstPage()
-		.then((r) => r[0]);
-}
-
 interface User {
 	email: string;
 	household: string;
@@ -40,10 +32,10 @@ interface User {
 }
 
 function createJwt(user: User) {
-	const { email, name, household } = user;
+	const { password, ...rest } = user;
 	return jwt.sign(
 		{
-			data: { user: { email, name, household } }
+			data: { user: rest }
 		},
 		import.meta.env.VITE_JWT_SECRET,
 		{ expiresIn: `7h` }
@@ -51,26 +43,29 @@ function createJwt(user: User) {
 }
 
 function handleLoginReturn(cookies) {
-	const returnPath = cookies.get(import.meta.env.VITE_COOKIE_NAME + '_return') ?? '/code/items';
-	if (returnPath) {
+	let returnPath;
+	try {
+		returnPath = cookies.get(import.meta.env.VITE_COOKIE_NAME + '_return') ?? '/code/items';
+
 		cookies.delete(import.meta.env.VITE_COOKIE_NAME + '_return');
-		throw redirect(303, returnPath);
+	} catch (e) {
+		//
 	}
+	throw redirect(303, returnPath);
 }
 
 export const actions: Actions = {
 	async login({ cookies, request }) {
 		const data = await request.formData();
-		const email = data.get('email');
+		const email = escape(data.get('email'));
 		const password = data.get('password');
 
 		try {
 			requireFields({ email, password });
 
-			const user = await getUserByEmail(email);
-			if (!(await bcrypt.compare(password, user.fields.password))) throw new Error('incorrect password');
+			const user = await pb.collection('users').authWithPassword(email, password);
 
-			if (!user.fields.invited) {
+			if (!user.record.invited) {
 				return fail(400, {
 					error: {
 						message: `You're registered but still need to wait for your invitation to be accepted`
@@ -78,7 +73,7 @@ export const actions: Actions = {
 				});
 			}
 
-			cookies.set(import.meta.env.VITE_COOKIE_NAME, createJwt(user.fields));
+			cookies.set(import.meta.env.VITE_COOKIE_NAME, createJwt(user), { path: '/' });
 		} catch (error) {
 			console.error(error);
 			return fail(400, {
@@ -93,28 +88,40 @@ export const actions: Actions = {
 	},
 	async register({ cookies, request }) {
 		const data = await request.formData();
-		const email = data.get('email');
-		const name = data.get('name');
+		const email = escape(data.get('email'));
+		const name = escape(data.get('name'));
 		const password = data.get('password');
-		const household = data.get('household');
+		const householdName = escape(data.get('household'));
 
 		try {
-			requireFields({ email, name, password, household });
+			requireFields({ email, name, password, householdName });
 
-			if (await getUserByEmail(email))
-				throw new FieldError('email', 'This email is already in registered');
+			// if (await getUserByEmail(email))
+			// 	throw new FieldError('email', 'This email is already in registered');
+
+			let household = await pb
+				.collection('households')
+				.getFirstListItem(`name="${householdName}"`)
+				.catch(() => {});
+
+			if (!household) household = await pb.collection('households').create({ name: householdName });
 
 			const user = {
-				name: escape(name),
-				household: escape(household?.toString().toLowerCase()),
-				email: escape(email),
-				password: await bcrypt.hash(password, parseInt(import.meta.env.VITE_BCRYPT_SALT_ROUNDS))
+				name,
+				household: household?.id,
+				email,
+				password, //await bcrypt.hash(password, parseInt(import.meta.env.VITE_BCRYPT_SALT_ROUNDS))
+				passwordConfirm: password,
+				emailVisibility: true
 			};
 
-			await db('users').create([{ fields: user }]);
+			// await db('users').create([{ fields: user }]);
+			await pb.collection('users').create(user);
+			await pb.collection('users').requestVerification(user.email);
 		} catch (error) {
+			console.dir(error, { depth: 3 });
 			return fail(400, {
-				fields: { email, name, household, type: 'register' },
+				fields: { email, name, household: householdName, type: 'register' },
 				error: { field: error?.field, message: error.message }
 			});
 		}

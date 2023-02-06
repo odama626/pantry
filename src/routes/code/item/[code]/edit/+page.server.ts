@@ -1,20 +1,19 @@
-import { db } from '$lib/server/db';
-import type { PageLoad } from './$types';
+import { pb, prepareItemRecord } from '$lib/server/db';
+import type { PageServerLoad } from './$types';
 
 export const load = (async ({ params }) => {
 	const code = params.code;
 
 	try {
-		const item = await db('items')
-			.select({
-				maxRecords: 1,
-				filterByFormula: `{code} = '${code}'`
-			})
-			.firstPage()
-			.then((r) => r[0]);
+		const item = await pb
+			.collection('items')
+			.getFirstListItem(`code="${code}"`, { expand: `tags` })
+			.catch(() => {});
 
-		return item?._rawJson || { fields: { code } };
+		const payload = await prepareItemRecord(item);
+
+		return payload || { code };
 	} catch (e) {
 		console.error(e);
 	}
-}) satisfies PageLoad;
+}) satisfies PageServerLoad;

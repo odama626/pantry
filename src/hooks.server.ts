@@ -1,4 +1,5 @@
-import { type Handle } from '@sveltejs/kit';
+import { pb } from '$lib/server/db';
+import type { Handle } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 
 const safeRoutes = ['/', '/user'];
@@ -8,7 +9,10 @@ export const handle = (async ({ event, resolve }) => {
 
 	try {
 		event.locals.token = jwt.verify(rawJwt, import.meta.env.VITE_JWT_SECRET)?.data;
+		pb.authStore.save(event?.locals?.token?.user?.token, event?.locals?.token?.user?.record);
+		if (!pb.authStore.isValid) throw new Error('Unathenticated')
 	} catch (e) {
+		console.error(e);
 		if (!safeRoutes.includes(event.url.pathname)) {
 			console.error('user not logged in');
 			return new Response('Redirect', {
@@ -25,9 +29,9 @@ export const handle = (async ({ event, resolve }) => {
 		}
 	}
 
-	if (event.url.pathname.startsWith('/custom')) {
-		return new Response('custom response');
-	}
+	// if (event.url.pathname.startsWith('/custom')) {
+	// 	return new Response('custom response');
+	// }
 
 	const response = await resolve(event);
 	return response;

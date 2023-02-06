@@ -64,7 +64,7 @@
 				</form>
 			</dialog>
 		{:else}
-			<h2>Logged in as {data?.user?.name}</h2>
+			<h2>Logged in as {data?.user?.record?.name}</h2>
 			<form method="post" action="?/logout">
 				<button>Logout</button>
 			</form>

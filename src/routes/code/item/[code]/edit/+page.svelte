@@ -4,15 +4,15 @@
 	export let data: PageData;
 
 	const today = new Date().toJSON().split('T')[0];
-	let date = data.fields.stored ?? today;
+	let date = data.stored ?? today;
 </script>
 
 <main class="container">
 	<h2>Edit</h2>
 	<form method="post" action="/code/item?/edit">
 		<input type="hidden" name="id" value={data.id ?? null} />
-		<input type="hidden" name="code" value={data.fields.code} />
-		<input name="description" value={data.fields.description ?? ''} />
+		<input type="hidden" name="code" value={data.code} />
+		<input name="description" value={data.description ?? ''} />
 		<div class="flex">
 			<input bind:value={date} name="stored" type="date" />
 			<button class="contrast outline" type="button" on:click={() => (date = today)}>Today</button>
