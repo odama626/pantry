@@ -42,15 +42,16 @@
 				field: 'stored',
 				type: 'rightAligned',
 				initialSort: 'asc',
+				width: 120,
 				valueGetter: (params) => formatters.date(params.data.stored)
 			},
-			{
-				headerName: '',
-				width: 64,
-				cellRenderer: cellRendererFactory((cell, params) => {
-					new GridActionBar({ target: cell.eGui, props: { data: params.data } });
-				})
-			}
+			// {
+			// 	headerName: '',
+			// 	width: 64,
+			// 	cellRenderer: cellRendererFactory((cell, params) => {
+			// 		new GridActionBar({ target: cell.eGui, props: { data: params.data } });
+			// 	})
+			// }
 		],
 		rowData: data.items
 	};
