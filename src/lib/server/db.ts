@@ -1,7 +1,7 @@
 import PocketBase from 'pocketbase';
 import NounProject from 'the-noun-project';
 
-export const pb = new PocketBase('https://pb.pantry.lilbyte.dev');
+export const pb = new PocketBase(import.meta.env.VITE_PB_DOMAIN);
 
 const nounProject = new NounProject({
 	key: import.meta.env.VITE_NOUN_KEY,

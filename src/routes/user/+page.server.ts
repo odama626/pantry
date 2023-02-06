@@ -96,9 +96,6 @@ export const actions: Actions = {
 		try {
 			requireFields({ email, name, password, householdName });
 
-			// if (await getUserByEmail(email))
-			// 	throw new FieldError('email', 'This email is already in registered');
-
 			let household = await pb
 				.collection('households')
 				.getFirstListItem(`name="${householdName}"`)
@@ -110,7 +107,7 @@ export const actions: Actions = {
 				name,
 				household: household?.id,
 				email,
-				password, //await bcrypt.hash(password, parseInt(import.meta.env.VITE_BCRYPT_SALT_ROUNDS))
+				password,
 				passwordConfirm: password,
 				emailVisibility: true
 			};
