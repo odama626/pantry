@@ -36,7 +36,12 @@
 					});
 				})
 			},
-			{ headerName: 'Description', field: 'description', flex: 1 },
+			{
+				headerName: 'Description',
+				field: 'description',
+				flex: 1,
+				valueGetter: (params) => formatters.titleCase(params.data.description)
+			},
 			{
 				headerName: 'Stored On',
 				field: 'stored',
@@ -44,7 +49,7 @@
 				initialSort: 'asc',
 				width: 120,
 				valueGetter: (params) => formatters.date(params.data.stored)
-			},
+			}
 			// {
 			// 	headerName: '',
 			// 	width: 64,
@@ -66,10 +71,6 @@
 </main>
 
 <style lang="scss">
-	[data-end] {
-		text-align: end;
-	}
-
 	.container {
 		display: flex;
 		flex-direction: column;
