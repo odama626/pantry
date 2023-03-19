@@ -9,7 +9,7 @@ export const actions: Actions = {
 
 		try {
 			const fields = {
-				code: data.code,
+				code: data.code === 'undefined' ? undefined : data.code,
 				description: data.description,
 				stored: data.stored,
 				tags: [],
@@ -18,15 +18,19 @@ export const actions: Actions = {
 
 			const id = data.id;
 
+			console.log({ fields, id });
+
 			if (id?.length) {
-				await pb.collection('items').update(data.id, fields);
+				await pb.collection('items').update(id, fields);
 			} else {
-				await pb.collection('items').create(fields);
+				const result = await pb.collection('items').create(fields);
+				console.log({ result });
 			}
 		} catch (e) {
 			console.dir(e, { depth: 5 });
 			return fail(500, e.message);
 		}
+		console.log('redirect', data.code)
 		throw redirect(303, `/code/item/${data.code}`);
 	}
 };

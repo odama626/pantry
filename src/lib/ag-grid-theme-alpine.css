@@ -4,6 +4,12 @@
   font-weight: normal;
   font-style: normal;
 }
+
+.ag-root-wrapper {
+  border: none;
+  border-radius: 3px;
+}
+
 .ag-theme-alpine,
 .ag-theme-alpine-dark {
   --ag-alpine-active-color: #2196f3;
@@ -74,14 +80,14 @@
 @media only screen and (prefers-color-scheme: dark) {
   .ag-theme-alpine {
     color-scheme: dark;
-    --ag-background-color: #181d1f;
+    --ag-background-color: #0A171E;
     --ag-foreground-color: #fff;
     --ag-border-color: #68686e;
     --ag-secondary-border-color: rgba(88, 86, 82, 0.5);
     --ag-modal-overlay-background-color: rgba(24, 29, 31, 0.66);
-    --ag-header-background-color: #222628;
+    --ag-header-background-color: #152D3D;
     --ag-tooltip-background-color: #222628;
-    --ag-odd-row-background-color: #222628;
+    --ag-odd-row-background-color: #081117;
     --ag-control-panel-background-color: #222628;
     --ag-subheader-background-color: #000;
     --ag-input-disabled-background-color: #282c2f;
