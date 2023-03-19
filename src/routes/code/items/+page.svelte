@@ -159,11 +159,7 @@
 
 	.actions.bottom {
 		margin-top: var(--spacing);
-	}
-
-	input {
-		background: white;
-		padding-right: 45px;
+		justify-content: space-around;
 	}
 
 	.generate {
@@ -183,6 +179,11 @@
 			top: 0;
 			/* width: 64px; */
 			margin: 1px;
+		}
+
+		input {
+			background: white;
+			padding-right: 45px;
 		}
 	}
 
