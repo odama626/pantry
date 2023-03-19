@@ -6,15 +6,19 @@
 	let videoElement;
 	let overlayElement;
 	const emitter = new EventEmitter();
-	const events = []
+	let events = ['asdf','adf']
 
 	onMount(() => {
-		const qrScanner = new QrScanner(videoElement, console.log, { returnDetailedScanResult: true });
+		const qrScanner = new QrScanner(videoElement, event => emitter.emit(event.data), { returnDetailedScanResult: true });
 
 		qrScanner.start();
 		console.log('scanning')
 
-		emitter.subscribe(events.unshift);
+		emitter.subscribe(event => {
+			events.unshift(event);
+			events = events;
+			console.log({ events })
+	});
 		return () => {
 			qrScanner.stop();
 		};
@@ -29,4 +33,11 @@
 	{/each}
 </div>
 <style lang="scss">
+
+	.bottom {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+	}
 </style>
