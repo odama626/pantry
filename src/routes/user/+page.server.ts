@@ -46,7 +46,6 @@ function handleLoginReturn(cookies) {
 	let returnPath;
 	try {
 		returnPath = cookies.get(import.meta.env.VITE_COOKIE_NAME + '_return') ?? '/code/items';
-
 		cookies.delete(import.meta.env.VITE_COOKIE_NAME + '_return');
 	} catch (e) {
 		//
@@ -57,7 +56,7 @@ function handleLoginReturn(cookies) {
 export const actions: Actions = {
 	async login({ cookies, request }) {
 		const data = await request.formData();
-		const email = escape(data.get('email'));
+		const email = escape(data.get('email') as string)?.toLowerCase?.();
 		const password = data.get('password');
 
 		try {
@@ -73,7 +72,10 @@ export const actions: Actions = {
 				});
 			}
 
-			cookies.set(import.meta.env.VITE_COOKIE_NAME, createJwt(user), { path: '/' });
+			cookies.set(import.meta.env.VITE_COOKIE_NAME, createJwt(user), {
+				path: '/',
+				secure: !import.meta.hot
+			});
 		} catch (error) {
 			console.error(error);
 			return fail(400, {
@@ -88,14 +90,15 @@ export const actions: Actions = {
 	},
 	async register({ cookies, request }) {
 		const data = await request.formData();
-		const email = escape(data.get('email'));
-		const name = escape(data.get('name'));
+		const email = escape(data.get('email') as string).toLowerCase();
+		const name = escape(data.get('name') as string);
 		const password = data.get('password');
-		const householdName = escape(data.get('household'));
+		const householdName = escape(data.get('household')).toLowerCase();
 
 		try {
 			requireFields({ email, name, password, householdName });
 
+			// we shouldn't just add people to households, people could have the same last name
 			let household = await pb
 				.collection('households')
 				.getFirstListItem(`name="${householdName}"`)
@@ -113,7 +116,8 @@ export const actions: Actions = {
 			};
 
 			// await db('users').create([{ fields: user }]);
-			await pb.collection('users').create(user);
+			const createdUser = await pb.collection('users').create(user);
+
 			await pb.collection('users').requestVerification(user.email);
 		} catch (error) {
 			console.dir(error, { depth: 3 });

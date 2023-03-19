@@ -5,6 +5,8 @@
 
 	const today = new Date().toJSON().split('T')[0];
 	let date = data.stored ?? today;
+
+	console.log({ data })
 </script>
 
 <main class="container">

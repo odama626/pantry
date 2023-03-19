@@ -10,7 +10,7 @@ export const load = (async ({ params }) => {
 			.getFirstListItem(`code="${code}"`, { expand: `tags` })
 			.catch(() => {});
 
-		const payload = await prepareItemRecord(item);
+		const payload = item && (await prepareItemRecord(item));
 
 		return payload || { code };
 	} catch (e) {

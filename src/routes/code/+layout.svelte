@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import '@picocss/pico/css/pico.css';
+	import '$lib/theme.scss';
 </script>
 
-
 <slot />
+
+<style lang="scss">
+</style>
