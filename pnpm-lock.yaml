@@ -53,6 +53,9 @@ devDependencies:
   '@sveltejs/kit':
     specifier: ^1.15.8
     version: 1.15.8(svelte@3.58.0)(vite@4.3.1)
+  '@types/color-hash':
+    specifier: ^1.0.2
+    version: 1.0.2
   '@types/lodash-es':
     specifier: ^4.17.7
     version: 4.17.7
@@ -738,6 +741,10 @@ packages:
 
   /@types/chai@4.3.4:
     resolution: {integrity: sha512-KnRanxnpfpjUTqTCXslZSEdLfXExwgNxYPdiO2WGUj8+HDjFi8R3k5RVKPeSCzLjCcshCAtVO2QBbVuAV4kTnw==}
+    dev: true
+
+  /@types/color-hash@1.0.2:
+    resolution: {integrity: sha512-QJCVXSVRse+mMvzWQ8vH6AcKxtqCgHPHf5abAdGn86DEeQdUpSJnKAeCa1+hZuohaUF3l4RhigC9akRx82Bwig==}
     dev: true
 
   /@types/cookie@0.5.1:
