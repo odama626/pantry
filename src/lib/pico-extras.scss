@@ -1,0 +1,12 @@
+button,
+[role="button"] {
+  &.link {
+    background-color: transparent;
+    color: var(--primary);
+    border-color: transparent;
+
+    &:hover {
+      color: var(--primary-hover);
+    }
+  }
+}

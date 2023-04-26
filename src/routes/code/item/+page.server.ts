@@ -1,4 +1,4 @@
-import { pb } from '$lib/server/db';
+import { generateTags, pb } from '$lib/server/db';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
@@ -8,29 +8,29 @@ export const actions: Actions = {
 		const data = Object.fromEntries(formData.entries());
 
 		try {
+			const tags = await generateTags(data.name, JSON.parse(data.tags));
+
 			const fields = {
 				code: data.code === 'undefined' ? undefined : data.code,
+				name: data.name,
 				description: data.description,
 				stored: data.stored,
-				tags: [],
+				tags: tags.map((tag) => tag.id),
 				household: locals?.token?.user?.record?.household
 			};
 
 			const id = data.id;
 
-			console.log({ fields, id });
-
 			if (id?.length) {
 				await pb.collection('items').update(id, fields);
 			} else {
-				const result = await pb.collection('items').create(fields);
-				console.log({ result });
+				await pb.collection('items').create(fields);
 			}
 		} catch (e) {
 			console.dir(e, { depth: 5 });
 			return fail(500, e.message);
 		}
-		console.log('redirect', data.code)
+		console.log('redirect', data.code);
 		throw redirect(303, `/code/item/${data.code}`);
 	}
 };

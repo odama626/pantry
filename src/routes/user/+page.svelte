@@ -9,7 +9,7 @@
 	let type = form?.fields?.type ?? 'login';
 </script>
 
-<main class="container">
+<main class="container page">
 	<section>
 		{#if !data.authenticated}
 			<dialog open>

@@ -1,0 +1,210 @@
+diff --git a/node_modules/.cache/@babel/register/.babel.7.5.5.development.json b/node_modules/.cache/@babel/register/.babel.7.5.5.development.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..9e26dfeeb6e641a33dae4961196235bdb965b21b
+--- /dev/null
++++ b/node_modules/.cache/@babel/register/.babel.7.5.5.development.json
+@@ -0,0 +1 @@
++{}
+\ No newline at end of file
+diff --git a/src/Typeahead.svelte b/src/Typeahead.svelte
+index 3b30532ae1caa83dc8aa9166213449633dcac895..092d4cfb2fae576df56d439f5b1a63ede3277f74 100644
+--- a/src/Typeahead.svelte
++++ b/src/Typeahead.svelte
+@@ -3,20 +3,20 @@
+    * @template TItem = string | number | Record<string, any>
+    */
+ 
+-  export let id = "typeahead-" + Math.random().toString(36);
+-  export let value = "";
++  export let id = 'typeahead-' + Math.random().toString(36);
++  export let value = '';
+ 
+   /** @type {TItem[]} */
+   export let data = [];
+ 
+   /** @type {(item: TItem) => any} */
+-  export let extract = (item) => item;
++  export let extract = item => item;
+ 
+   /** @type {(item: TItem) => boolean} */
+-  export let disable = (item) => false;
++  export let disable = item => false;
+ 
+   /** @type {(item: TItem) => boolean} */
+-  export let filter = (item) => false;
++  export let filter = item => false;
+ 
+   /** Set to `false` to prevent the first result from being selected */
+   export let autoselect = true;
+@@ -25,7 +25,7 @@
+    * Set to `keep` to keep the search field unchanged after select, set to `clear` to auto-clear search field
+    * @type {"update" | "clear" | "keep"}
+    */
+-  export let inputAfterSelect = "update";
++  export let inputAfterSelect = 'update';
+ 
+   /** @type {{ original: TItem; index: number; score: number; string: string; disabled?: boolean; }[]} */
+   export let results = [];
+@@ -45,9 +45,9 @@
+    */
+   export let limit = Infinity;
+ 
+-  import fuzzy from "fuzzy";
+-  import Search from "svelte-search";
+-  import { tick, createEventDispatcher, afterUpdate } from "svelte";
++  import fuzzy from 'fuzzy';
++  import Search from 'svelte-search';
++  import { tick, createEventDispatcher, afterUpdate } from 'svelte';
+ 
+   const dispatch = createEventDispatcher();
+ 
+@@ -55,7 +55,7 @@
+   let searchRef = null;
+   let hideDropdown = false;
+   let selectedIndex = -1;
+-  let prevResults = "";
++  let prevResults = '';
+   let isFocused = false;
+ 
+   afterUpdate(() => {
+@@ -63,7 +63,7 @@
+       selectedIndex = getNextNonDisabledIndex();
+     }
+ 
+-    if (prevResults !== resultsId && !$$slots["no-results"]) {
++    if (prevResults !== resultsId && !$$slots['no-results']) {
+       hideDropdown = results.length === 0;
+     }
+ 
+@@ -73,22 +73,24 @@
+   async function select() {
+     const result = results[selectedIndex];
+ 
+-    if (result.disabled) return;
++    if (result?.disabled) return;
+ 
+-    const selectedValue = extract(result.original);
++    const original = result ? result.original : null;
++    const selectedValue = original ? extract(original) : null;
+     const searchedValue = value;
+ 
+-    if (inputAfterSelect == "clear") value = "";
+-    if (inputAfterSelect == "update") value = selectedValue;
++    if (inputAfterSelect == 'clear') value = '';
++    if (inputAfterSelect == 'update') value = selectedValue;
+ 
+-    dispatch("select", {
++    dispatch('select', {
+       selectedIndex,
+       searched: searchedValue,
+       selected: selectedValue,
+-      original: result.original,
+-      originalIndex: result.index,
++      original,
++      originalIndex: result?.index ?? null,
+     });
+-
++    selectedIndex = -1;
++    
+     await tick();
+ 
+     if (focusAfterSelect) searchRef.focus();
+@@ -116,9 +118,7 @@
+   /** @type {(direction: -1 | 1) => void} */
+   function change(direction) {
+     let index =
+-      direction === 1 && selectedIndex === results.length - 1
+-        ? 0
+-        : selectedIndex + direction;
++      direction === 1 && selectedIndex === results.length - 1 ? 0 : selectedIndex + direction;
+     if (index < 0) index = results.length - 1;
+ 
+     let disabled = results[index].disabled;
+@@ -142,21 +142,21 @@
+     isFocused = false;
+   };
+ 
+-  $: options = { pre: "<mark>", post: "</mark>", extract };
++  $: options = { pre: '<mark>', post: '</mark>', extract };
+   $: results = fuzzy
+     .filter(value, data, options)
+     .filter(({ score }) => score > 0)
+     .slice(0, limit)
+-    .filter((result) => !filter(result.original))
+-    .map((result) => ({ ...result, disabled: disable(result.original) }));
+-  $: resultsId = results.map((result) => extract(result.original)).join("");
++    .filter(result => !filter(result.original))
++    .map(result => ({ ...result, disabled: disable(result.original) }));
++  $: resultsId = results.map(result => extract(result.original)).join('');
+   $: showResults = !hideDropdown && results.length > 0;
+   $: if (showDropdownOnFocus) {
+     showResults = showResults && isFocused;
+   }
+   $: if (isFocused && showAllResultsOnFocus && value.length === 0) {
+     results = data
+-      .filter((datum) => !filter(datum))
++      .filter(datum => !filter(datum))
+       .map((original, index) => ({
+         disabled: disable(original),
+         index,
+@@ -193,9 +193,7 @@
+     aria-autocomplete="list"
+     aria-controls="{id}-listbox"
+     aria-labelledby="{id}-label"
+-    aria-activedescendant={selectedIndex >= 0 &&
+-    !hideDropdown &&
+-    results.length > 0
++    aria-activedescendant={selectedIndex >= 0 && !hideDropdown && results.length > 0
+       ? `${id}-result-${selectedIndex}`
+       : null}
+     bind:value
+@@ -214,24 +212,24 @@
+     on:clear={open}
+     on:blur
+     on:keydown
+-    on:keydown={(e) => {
+-      if (results.length === 0) return;
++    on:keydown={e => {
++      if (results.length === 0 && e.key !== 'Enter') return;
+ 
+       switch (e.key) {
+-        case "Enter":
++        case 'Enter':
+           select();
+           break;
+-        case "ArrowDown":
++        case 'ArrowDown':
+           e.preventDefault();
+           change(1);
+           break;
+-        case "ArrowUp":
++        case 'ArrowUp':
+           e.preventDefault();
+           change(-1);
+           break;
+-        case "Escape":
++        case 'Escape':
+           e.preventDefault();
+-          value = "";
++          value = '';
+           searchRef?.focus();
+           close();
+           break;
+@@ -269,7 +267,7 @@
+         </li>
+       {/each}
+     {/if}
+-    {#if $$slots["no-results"] && !hideDropdown && value.length > 0 && results.length === 0}
++    {#if $$slots['no-results'] && !hideDropdown && value.length > 0 && results.length === 0}
+       <div class:no-results={true}>
+         <slot name="no-results" {value} />
+       </div>
+@@ -295,7 +293,7 @@
+     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+   }
+ 
+-  [aria-expanded="true"] ul {
++  [aria-expanded='true'] ul {
+     z-index: 1;
+   }
+ 

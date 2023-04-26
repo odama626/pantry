@@ -29,7 +29,13 @@
 </script>
 
 <div bind:this={overlayElement} />
-<div class="container">
+<div class="container page">
 	<h1>Pantry Code Lookup</h1>
+	<video bind:this={videoElement} />
 </div>
-<video bind:this={videoElement} />
+
+<style lang="scss">
+	video {
+		width: 100%;
+	}
+</style>

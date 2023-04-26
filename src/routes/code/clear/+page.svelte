@@ -28,7 +28,7 @@
 				message = `Failed to delete item with code ${code}`;
 			}
 		} else {
-			message = `Deleted Item ${result.item.description}`;
+			message = `Deleted Item ${result.item.name}`;
 		}
 		events.unshift({ code, message });
 		events = events;
@@ -52,17 +52,21 @@
 	});
 </script>
 
-<div bind:this={overlayElement} />
-<div class="container">
-	<h1>Cleaning up</h1>
-	<p>Emptying the fridge?<br />Spring cleaning?<br /> all codes you scan will be removed from your pantry.</p>
-</div>
-<video bind:this={videoElement} />
-<div class="container">
-	<div class="bottom">
-		{#each events as event}
-			<article>{event.message}</article>
-		{/each}
+<div class="page">
+	<div bind:this={overlayElement} />
+	<div class="container">
+		<h1>Cleaning up</h1>
+		<p>
+			Emptying the fridge?<br />Spring cleaning?<br /> all codes you scan will be removed from your pantry.
+		</p>
+	</div>
+	<video bind:this={videoElement} />
+	<div class="container">
+		<div class="bottom">
+			{#each events as event}
+				<article>{event.message}</article>
+			{/each}
+		</div>
 	</div>
 </div>
 
@@ -79,5 +83,9 @@
 	article {
 		margin: 0.25rem 0;
 		padding: var(--spacing);
+	}
+
+	video {
+		width: 100%;
 	}
 </style>

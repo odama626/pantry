@@ -1,5 +1,6 @@
 import PocketBase from 'pocketbase';
 import NounProject from 'the-noun-project';
+import type { TagsRecord } from './db.types';
 
 export const pb = new PocketBase(import.meta.env.VITE_PB_DOMAIN);
 
@@ -8,7 +9,7 @@ const nounProject = new NounProject({
 	secret: import.meta.env.VITE_NOUN_SECRET
 });
 
-function getIcon(term: string) {
+function getIcon(term: string): Promise<string> {
 	return new Promise((resolve, reject) =>
 		nounProject.getIconsByTerm(term, { limit: 50 }, (err, data) => {
 			if (err) return reject(err);
@@ -20,10 +21,10 @@ function getIcon(term: string) {
 	);
 }
 
-export async function generateTags(name: string) {
+export async function generateTags(name: string, additionalTags: TagsRecord[] = []) {
 	const words = name.toLowerCase().split(' ');
-	const tags = words
-		.reduceRight(
+	const automaticTags = words
+		.reduceRight<{ tags: string[]; accum: string }>(
 			(result, next) => {
 				const accum = `${next} ${result.accum}`.trim();
 				result.tags.push(accum);
@@ -34,56 +35,64 @@ export async function generateTags(name: string) {
 		)
 		.tags.filter(Boolean);
 
+	const manualTags = additionalTags.map((tag) => tag.name);
+
 	const existing = await pb
 		.collection('tags')
-		.getList(0, tags.length, {
-			filter: tags.map((tag) => `name="${tag}"`).join(' || '),
+		.getList(0, automaticTags.length + manualTags.length, {
+			filter: [...automaticTags, ...manualTags].map((tag) => `name="${tag}"`).join(' || '),
 			sort: '-created'
 		})
 		.then((result) => Object.fromEntries(result.items.map((item) => [item.name, item])));
 
 	console.dir({ existing }, { depth: 5 });
 
-	const results = await Promise.all(
-		tags.map(async (tag) => {
+	const results = await Promise.all([
+		...automaticTags.map(async (tag) => {
 			if (existing[tag]) return existing[tag];
 			const iconUrl = await getIcon(tag).catch(console.error);
 			if (!iconUrl) return;
-			// console.log({ icon });
 
 			const iconFile = await fetch(iconUrl).then((r) => r.blob());
 
 			const formData = new FormData();
-			formData.set('name', tag);
+			formData.set('name', tag.trim());
 			formData.set('icon', iconFile);
+			formData.set('custom', false);
+			return await pb.collection('tags').create(formData, { $autoCancel: false });
+		}),
+		...additionalTags.map(async (tag) => {
+			if (!tag.name) return;
+			if (existing[tag.name]) return existing[tag.name];
+
+			const iconUrl = await getIcon(tag.name).catch(console.error);
+
+			const iconFile = iconUrl && (await fetch(iconUrl).then((r) => r.blob()));
+
+			const formData = new FormData();
+			formData.set('name', tag.name.trim());
+			iconFile && formData.set('icon', iconFile);
+			formData.set('custom', true);
 			return await pb.collection('tags').create(formData, { $autoCancel: false });
 		})
-	);
+	]);
 
 	return results.filter(Boolean);
 }
 
 export async function prepareItemRecord(item: Record<string, any>) {
-	if (item && !item?.tags?.length) {
-		const tags = await generateTags(item.description);
-		item = await pb
-			.collection('items')
-			.update(item.id, { tags: tags.map((tag) => tag.id) }, { expand: `tags` });
-	}
-
 	const payload = item?.export();
 	payload.expand.tags = item?.expand?.tags
 		?.map((tag) => {
 			return {
 				...tag.export(),
-				icon: pb.getFileUrl(tag, tag.icon)
+				icon: tag.icon ? pb.getFileUrl(tag, tag.icon) : '/unknown-tag.svg'
 			};
 		})
 		.sort((a, b) => b.name.length - a.name.length);
 
 	return payload;
 }
-
 
 export function exportRecord(record, map = {}, field?: string) {
 	if (Array.isArray(record)) return record.map((value) => exportRecord(value, map, field));
