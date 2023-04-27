@@ -52,7 +52,8 @@
 	},
 	"pnpm": {
 		"patchedDependencies": {
-			"svelte-typeahead@4.4.1": "patches/svelte-typeahead@4.4.1.patch"
+			"svelte-typeahead@4.4.1": "patches/svelte-typeahead@4.4.1.patch",
+			"color-hash@2.0.2": "patches/color-hash@2.0.2.patch"
 		}
 	}
 }

@@ -1,6 +1,9 @@
 lockfileVersion: '6.0'
 
 patchedDependencies:
+  color-hash@2.0.2:
+    hash: rlcrmxpit33ul373wol3qquv54
+    path: patches/color-hash@2.0.2.patch
   svelte-typeahead@4.4.1:
     hash: rp35qt6xs4kjmajs7552plmkpy
     path: patches/svelte-typeahead@4.4.1.patch
@@ -14,7 +17,7 @@ dependencies:
     version: 29.3.3
   color-hash:
     specifier: ^2.0.2
-    version: 2.0.2
+    version: 2.0.2(patch_hash=rlcrmxpit33ul373wol3qquv54)
   date-fns:
     specifier: ^2.29.3
     version: 2.29.3
@@ -1282,9 +1285,10 @@ packages:
     dependencies:
       color-name: 1.1.4
 
-  /color-hash@2.0.2:
+  /color-hash@2.0.2(patch_hash=rlcrmxpit33ul373wol3qquv54):
     resolution: {integrity: sha512-6exeENAqBTuIR1wIo36mR8xVVBv6l1hSLd7Qmvf6158Ld1L15/dbahR9VUOiX7GmGJBCnQyS0EY+I8x+wa7egg==}
     dev: false
+    patched: true
 
   /color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
