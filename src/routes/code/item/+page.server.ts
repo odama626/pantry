@@ -30,7 +30,6 @@ export const actions: Actions = {
 			console.dir(e, { depth: 5 });
 			return fail(500, e.message);
 		}
-		console.log('redirect', data.code);
 		throw redirect(303, `/code/item/${data.code}`);
 	}
 };

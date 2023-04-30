@@ -3,9 +3,10 @@
 	import * as formatters from '$lib/formatters';
 	import Image from '$lib/image.svelte';
 	import Tag from '$lib/tag.svelte';
+	import { getIcon } from '$lib/getIcon';
 
-	export let data: PageData;
-	const icon = data?.expand?.tags?.find((tag) => !tag.custom)?.icon ?? '/unknown-tag.svg';
+	export let data;
+	const icon = getIcon(data);
 </script>
 
 <main class="container page">

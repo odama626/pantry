@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getIcon } from '$lib/getIcon.js';
 	import hashColor from '$lib/hashColor.js';
 	import Image from '$lib/image.svelte';
 	import type { TagsRecord, TagsResponse } from '$lib/server/db.types.js';
@@ -11,7 +12,7 @@
 	const today = new Date().toJSON().split('T')[0];
 	let date = data.stored ?? today;
 
-	const icon = data?.expand?.tags?.find((tag) => !tag.custom)?.icon ?? '/unknown-tag.svg';
+	const icon = getIcon(data);
 	let tags: TagsRecord[] = data.expand?.tags?.filter((tag) => tag.custom) ?? [];
 	let tagOptions: TagsResponse[] = [];
 
@@ -135,6 +136,18 @@
 			aspect-ratio: 1;
 
 			background-image: url("data:image/svg+xml,<svg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><circle r='50%' fill='none' cx='50%' cy='50%' stroke='%23FFFBF4' stroke-width='5' stroke-dasharray='10,20,10,20' stroke-dashoffset='0' stroke-linecap='butt'/></svg>");
+		}
+	}
+
+	@media screen and (max-width: 480px) {
+		.description {
+			display: flex;
+			flex-direction: column;
+			align-items: stretch;
+
+			.image {
+				display: none;
+			}
 		}
 	}
 

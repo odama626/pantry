@@ -1,8 +1,11 @@
 import { pb } from '$lib/server/db';
-import { requireFields } from '$lib/server/forms';
-import { fail, redirect } from '@sveltejs/kit';
+import type { UsersRecord, UsersResponse } from '$lib/server/db.types';
+import { throwZodStylePbError, zodForm } from '$lib/server/forms';
+import { fail, redirect, type Cookies } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import { escape } from 'lodash-es';
+import { escape, omit } from 'lodash-es';
+import type { RecordAuthResponse } from 'pocketbase';
+import { z } from 'zod';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async ({ params, cookies }) => {
@@ -25,17 +28,10 @@ export const load = (async ({ params, cookies }) => {
 	return state;
 }) satisfies PageServerLoad;
 
-interface User {
-	email: string;
-	household: string;
-	name: string;
-}
-
-function createJwt(user: User) {
-	const { password, ...rest } = user;
+function createJwt(user: RecordAuthResponse<UsersRecord>) {
 	return jwt.sign(
 		{
-			data: { user: rest }
+			data: { user }
 		},
 		import.meta.env.VITE_JWT_SECRET,
 		{ expiresIn: `7h` }
@@ -53,77 +49,94 @@ function handleLoginReturn(cookies) {
 	throw redirect(303, returnPath);
 }
 
+async function setCookie(
+	cookies: Cookies,
+	data: { email: string; password: string }
+): Promise<RecordAuthResponse<UsersResponse>> {
+	const user = await pb
+		.collection('users')
+		.authWithPassword<UsersResponse>(data.email, data.password)
+		.catch(throwZodStylePbError);
+
+	if (!user) throw { errors: [{ path: 'email', message: 'Failed to log in' }] };
+
+	cookies.set(import.meta.env.VITE_COOKIE_NAME, createJwt(user), {
+		path: '/',
+		secure: !import.meta.hot
+	});
+
+	return user;
+}
+
 export const actions: Actions = {
 	async login({ cookies, request }) {
-		const data = await request.formData();
-		const email = escape(data.get('email') as string)?.toLowerCase?.();
-		const password = data.get('password');
+		const { raw, success, data, error } = zodForm(await request.formData(), {
+			email: z.string().toLowerCase().trim().transform(escape),
+			password: z.string().transform(escape)
+		});
 
 		try {
-			requireFields({ email, password });
+			if (error) throw { errors: error.errors };
 
-			const user = await pb.collection('users').authWithPassword(email, password);
-
-			if (!user.record.invited) {
-				return fail(400, {
-					error: {
-						message: `You're registered but still need to wait for your invitation to be accepted`
-					}
-				});
-			}
-
-			cookies.set(import.meta.env.VITE_COOKIE_NAME, createJwt(user), {
-				path: '/',
-				secure: !import.meta.hot
-			});
+			await setCookie(cookies, data);
 		} catch (error) {
-			console.error(error);
 			return fail(400, {
-				fields: { email, type: 'login' },
-				error: { field: 'email', message: `email and password don't match` }
+				fields: { email: raw.email, type: 'login' },
+				error
 			});
 		}
 		return handleLoginReturn(cookies);
 	},
+
 	async logout({ cookies }) {
 		cookies.delete(import.meta.env.VITE_COOKIE_NAME);
 	},
+
 	async register({ cookies, request }) {
-		const data = await request.formData();
-		const email = escape(data.get('email') as string).toLowerCase();
-		const name = escape(data.get('name') as string);
-		const password = data.get('password');
-		const householdName = escape(data.get('household')).toLowerCase();
+		const { raw, data, error } = zodForm(await request.formData(), {
+			email: z.string().email().toLowerCase().trim().transform(escape),
+			name: z.string().trim().min(1, { message: 'Name must contain at least 1 character' }),
+			password: z.string().min(12, { message: 'password must be at least 12 characters long' }),
+			household: z.string().trim().transform(escape)
+		});
 
 		try {
-			requireFields({ email, name, password, householdName });
+			if (error) throw { errors: error.errors };
 
 			// we shouldn't just add people to households, people could have the same last name
-			let household = await pb
+			// let household = await pb
+			// 	.collection('households')
+			// 	.getFirstListItem(`name="${data.household}"`)
+			// 	.catch(() => {});
+
+			await pb
+				.collection('users')
+				.create<UsersResponse>({
+					...omit(data, 'household'),
+					passwordConfirm: data.password,
+					emailVisibility: true,
+					invited: true
+				})
+				.catch(throwZodStylePbError);
+
+			const user = await setCookie(cookies, data);
+
+			const household = await pb
 				.collection('households')
-				.getFirstListItem(`name="${householdName}"`)
-				.catch(() => {});
+				.create({ name: data.household, admins: [user.record.id] })
+				.catch(throwZodStylePbError);
 
-			if (!household) household = await pb.collection('households').create({ name: householdName });
+			await pb
+				.collection('users')
+				.update(user.record.id, { household: household.id })
+				.catch(throwZodStylePbError);
 
-			const user = {
-				name,
-				household: household?.id,
-				email,
-				password,
-				passwordConfirm: password,
-				emailVisibility: true
-			};
-
-			// await db('users').create([{ fields: user }]);
-			const createdUser = await pb.collection('users').create(user);
-
-			await pb.collection('users').requestVerification(user.email);
+			await pb.collection('users').requestVerification(data.email);
 		} catch (error) {
 			console.dir(error, { depth: 3 });
 			return fail(400, {
-				fields: { email, name, household: householdName, type: 'register' },
-				error: { field: error?.field, message: error.message }
+				fields: { ...omit(raw, 'password'), type: 'register' },
+				error
 			});
 		}
 	}

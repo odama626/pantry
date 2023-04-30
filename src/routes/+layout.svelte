@@ -9,7 +9,7 @@
 
 <div class="root">
 	<!-- <nav class="sidebar" /> -->
-	<nav class="container">
+	<nav class='container'>
 		<ul>
 			<li><a href="/code/items"><strong>Pantry</strong></a></li>
 			<!-- {#if user}<li><a href="/generate">Generate Codes</a></li>{/if} -->
@@ -41,12 +41,14 @@
 		grid-area: sidebar;
 		justify-content: flex-start;
 		gap: 1rem;
-		/* width: 64px; */
-		/* background: firebrick; */
 	}
 
 	nav.container {
 		grid-area: header;
+	}
+
+	nav ol:last-of-type, nav ul:last-of-type {
+		margin-right: 0;
 	}
 
 	.actions {

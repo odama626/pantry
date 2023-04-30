@@ -21,7 +21,7 @@
 
 	const gridOptions: GridOptions = {
 		detailRowAutoHeight: true,
-		pagination: true,
+		// pagination: true,
 		// rowHeight: 75,
 		defaultColDef: {
 			sortable: true,
