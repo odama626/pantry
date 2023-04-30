@@ -5,6 +5,7 @@
 export enum Collections {
 	Households = "households",
 	Items = "items",
+	ItemsByBase = "items_by_base",
 	Tags = "tags",
 	Users = "users",
 }
@@ -35,7 +36,7 @@ export type AuthSystemFields<T = never> = {
 
 export type HouseholdsRecord = {
 	name?: string
-	people?: RecordIdString[]
+	admins: RecordIdString[]
 }
 
 export type ItemsRecord = {
@@ -45,6 +46,12 @@ export type ItemsRecord = {
 	code: string
 	stored?: string
 	description?: HTMLString
+}
+
+export type ItemsByBaseRecord<Ttag = unknown> = {
+	name?: string
+	tag?: null | Ttag
+	c?: number
 }
 
 export type TagsRecord = {
@@ -57,12 +64,14 @@ export type UsersRecord = {
 	name?: string
 	avatar?: string
 	invited?: boolean
-	household: RecordIdString
+	household?: RecordIdString
+	households?: RecordIdString[]
 }
 
 // Response types include system fields and match responses from the PocketBase API
 export type HouseholdsResponse<Texpand = unknown> = HouseholdsRecord & BaseSystemFields<Texpand>
 export type ItemsResponse<Texpand = unknown> = ItemsRecord & BaseSystemFields<Texpand>
+export type ItemsByBaseResponse<Ttag = unknown> = ItemsByBaseRecord<Ttag> & BaseSystemFields
 export type TagsResponse = TagsRecord & BaseSystemFields
 export type UsersResponse<Texpand = unknown> = UsersRecord & AuthSystemFields<Texpand>
 
@@ -71,6 +80,7 @@ export type UsersResponse<Texpand = unknown> = UsersRecord & AuthSystemFields<Te
 export type CollectionRecords = {
 	households: HouseholdsRecord
 	items: ItemsRecord
+	items_by_base: ItemsByBaseRecord
 	tags: TagsRecord
 	users: UsersRecord
 }
@@ -78,6 +88,7 @@ export type CollectionRecords = {
 export type CollectionResponses = {
 	households: HouseholdsResponse
 	items: ItemsResponse
+	items_by_base: ItemsByBaseResponse
 	tags: TagsResponse
 	users: UsersResponse
 }
