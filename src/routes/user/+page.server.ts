@@ -103,19 +103,12 @@ export const actions: Actions = {
 		try {
 			if (error) throw { errors: error.errors };
 
-			// we shouldn't just add people to households, people could have the same last name
-			// let household = await pb
-			// 	.collection('households')
-			// 	.getFirstListItem(`name="${data.household}"`)
-			// 	.catch(() => {});
-
 			await pb
 				.collection('users')
 				.create<UsersResponse>({
 					...omit(data, 'household'),
 					passwordConfirm: data.password,
 					emailVisibility: true,
-					invited: true
 				})
 				.catch(throwZodStylePbError);
 
@@ -128,7 +121,7 @@ export const actions: Actions = {
 
 			await pb
 				.collection('users')
-				.update(user.record.id, { household: household.id })
+				.update(user.record.id, { defaultHousehold: household.id, households: [household.id] })
 				.catch(throwZodStylePbError);
 
 			await pb.collection('users').requestVerification(data.email);

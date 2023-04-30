@@ -14,10 +14,12 @@ export const load = (async ({ params, locals }) => {
 			items: []
 		};
 
-		const { household } = locals?.token?.user?.record ?? {};
+		const { defaultHousehold } = locals?.token?.user?.record ?? {};
 
-		if (household) {
+
+		if (defaultHousehold) {
 			result = await pb.collection('items').getList<ItemsResponse>(1, 500, {
+				filter:`household='${defaultHousehold}'`,
 				sort: `-created`,
 				expand: 'tags'
 			});

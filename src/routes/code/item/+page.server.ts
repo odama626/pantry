@@ -16,7 +16,7 @@ export const actions: Actions = {
 				description: data.description,
 				stored: data.stored,
 				tags: tags.map((tag) => tag.id),
-				household: locals?.token?.user?.record?.household
+				household: locals?.token?.user?.record?.defaultHousehold
 			};
 
 			const id = data.id;

@@ -45,7 +45,6 @@ export async function generateTags(name: string, additionalTags: TagsRecord[] = 
 		})
 		.then((result) => Object.fromEntries(result.items.map((item) => [item.name, item])));
 
-	console.dir({ existing }, { depth: 5 });
 
 	const results = await Promise.all([
 		...automaticTags.map(async (tag) => {

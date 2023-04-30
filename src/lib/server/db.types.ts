@@ -63,8 +63,7 @@ export type TagsRecord = {
 export type UsersRecord = {
 	name?: string
 	avatar?: string
-	invited?: boolean
-	household?: RecordIdString
+	defaultHousehold?: RecordIdString
 	households?: RecordIdString[]
 }
 
