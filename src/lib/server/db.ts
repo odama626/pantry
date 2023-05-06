@@ -1,4 +1,4 @@
-import PocketBase from 'pocketbase';
+import PocketBase, { BaseModel, ListResult } from 'pocketbase';
 import NounProject from 'the-noun-project';
 import type { TagsRecord } from './db.types';
 
@@ -44,7 +44,6 @@ export async function generateTags(name: string, additionalTags: TagsRecord[] = 
 			sort: '-created'
 		})
 		.then((result) => Object.fromEntries(result.items.map((item) => [item.name, item])));
-
 
 	const results = await Promise.all([
 		...automaticTags.map(async (tag) => {
@@ -103,4 +102,11 @@ export function exportRecord(record, map = {}, field?: string) {
 	});
 
 	return result;
+}
+
+export function exportListResult<T = BaseModel>(listResult: ListResult<T>) {
+	return {
+		...listResult,
+		items: listResult.items.map<T>(item => exportRecord(item))
+	};
 }

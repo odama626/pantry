@@ -2,7 +2,7 @@
 	const steps = [
 		{
 			description: 'Print QR code label',
-			image: `/landing/step_1.png`
+			image: `/landing/print.png`
 		},
 		{
 			description: `Attach the label to your container`,
@@ -10,11 +10,11 @@
 		},
 		{
 			description: `Scan QR Code`,
-			image: `/landing/step_3.png`
+			image: `/landing/list.png`
 		},
 		{
 			description: `Digitally document your pantry item`,
-			image: `/landing/step_4.png`
+			image: `/landing/scanner.png`
 		}
 	];
 </script>

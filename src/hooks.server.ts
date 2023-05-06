@@ -8,9 +8,12 @@ export const handle = (async ({ event, resolve }) => {
 	const rawJwt = event.cookies.get(import.meta.env.VITE_COOKIE_NAME);
 
 	try {
-		event.locals.token = jwt.verify(rawJwt, import.meta.env.VITE_JWT_SECRET)?.data;
-		pb.authStore.save(event?.locals?.token?.user?.token, event?.locals?.token?.user?.record);
-		if (!pb.authStore.isValid) throw new Error('Unathenticated')
+		const token = jwt.verify(rawJwt, import.meta.env.VITE_JWT_SECRET)?.data;
+		pb.authStore.save(token?.user?.token, token?.user?.record);
+
+		event.locals.user = token?.user?.record;
+		
+		if (!pb.authStore.isValid) throw new Error('Unathenticated');
 	} catch (e) {
 		console.error(e);
 		if (!safeRoutes.includes(event.url.pathname)) {

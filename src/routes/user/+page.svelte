@@ -1,8 +1,9 @@
 <script lang="ts">
-	import type { ActionData, PageData } from './$types';
-	import { capitalize } from 'lodash-es';
-	import '@picocss/pico/css/pico.css';
 	import Input from '$lib/input.svelte';
+	import '@picocss/pico/css/pico.css';
+	import { capitalize } from 'lodash-es';
+	import type { ActionData, PageData } from './$types';
+	import Account from './account.svelte';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -17,56 +18,52 @@
 <main class="container page">
 	<section>
 		{#if !data.authenticated}
-			<dialog open>
-				<form method="post" action="?/{type}">
-					<h2>{capitalize(type)}</h2>
-					{#if type === 'register'}
+			<form method="post" action="?/{type}">
+				<h2>{capitalize(type)}</h2>
+				{#if type === 'register'}
 					<blockquote>
-						If members of your household already use pantry you should have them send you an invite instead!
+						If members of your household already use pantry you should have them send you an invite
+						instead!
 						<strong>Registering</strong> will create a <strong>new household!</strong>
 					</blockquote>
-					{/if}
+				{/if}
+				<Input
+					label="Email"
+					name="email"
+					error={getError('email')}
+					value={form?.fields?.email ?? ''}
+				/>
+				<Input label="Password" error={getError('password')} name="password" type="password" />
+				{#if type === 'register'}
 					<Input
-						label="Email"
-						name="email"
-						error={getError('email')}
-						value={form?.fields?.email ?? ''}
+						label="Name"
+						name="name"
+						error={getError('name')}
+						value={form?.fields?.name ?? ''}
 					/>
-					<Input label="Password" error={getError('password')} name="password" type="password" />
-					{#if type === 'register'}
-						<Input
-							label="Name"
-							name="name"
-							error={getError('name')}
-							value={form?.fields?.name ?? ''}
-						/>
-						<Input
-							label="House Nickname"
-							description="Home, Lake House, etc"
-							error={getError('household')}
-							name="household"
-							value={form?.fields?.household ?? ''}
-						/>
-						<div>
-							Already have an account? <a on:click={() => (type = 'login')}>Login</a>
-						</div>
-					{:else}
-						<div>
-							Don't have an account? <a on:click={() => (type = 'register')}>Register</a>
-						</div>
-					{/if}
-					<br />
-					<button>
-						{#if type === 'register'}Register{:else}Login{/if}
-					</button>
-					{form?.error?.message ?? ''}
-				</form>
-			</dialog>
-		{:else}
-			<h2>Logged in as {data?.user?.record?.name}</h2>
-			<form method="post" action="?/logout">
-				<button>Logout</button>
+					<Input
+						label="House Nickname"
+						description="Home, Lake House, etc"
+						error={getError('household')}
+						name="household"
+						value={form?.fields?.household ?? ''}
+					/>
+					<div>
+						Already have an account? <a on:click={() => (type = 'login')}>Login</a>
+					</div>
+				{:else}
+					<div>
+						Don't have an account? <a on:click={() => (type = 'register')}>Register</a>
+					</div>
+				{/if}
+				<br />
+				<button>
+					{#if type === 'register'}Register{:else}Login{/if}
+				</button>
+				{form?.error?.message ?? ''}
 			</form>
+		{:else}
+			<Account user={data?.user} />
 		{/if}
 	</section>
 </main>

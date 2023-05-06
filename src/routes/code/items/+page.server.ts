@@ -1,10 +1,8 @@
-import type { PageServerLoad } from './$types';
-
 import { pb, prepareItemRecord } from '$lib/server/db';
 import type { ItemsResponse } from '$lib/server/db.types';
 import type { ListResult } from 'pocketbase';
 
-export const load = (async ({ params, locals }) => {
+export const load = async ({ params, locals }) => {
 	try {
 		let result: ListResult<ItemsResponse> = {
 			page: 0,
@@ -14,12 +12,11 @@ export const load = (async ({ params, locals }) => {
 			items: []
 		};
 
-		const { defaultHousehold } = locals?.token?.user?.record ?? {};
-
+		const { defaultHousehold } = locals.user ?? {};
 
 		if (defaultHousehold) {
 			result = await pb.collection('items').getList<ItemsResponse>(1, 500, {
-				filter:`household='${defaultHousehold}'`,
+				filter: `household='${defaultHousehold}'`,
 				sort: `-created`,
 				expand: 'tags'
 			});
@@ -31,4 +28,4 @@ export const load = (async ({ params, locals }) => {
 	} catch (e) {
 		console.dir(e, { depth: 5 });
 	}
-}) satisfies PageServerLoad;
+};

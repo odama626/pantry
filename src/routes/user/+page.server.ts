@@ -1,32 +1,28 @@
 import { pb } from '$lib/server/db';
-import type { UsersRecord, UsersResponse } from '$lib/server/db.types';
+import type { HouseholdsResponse, UsersRecord, UsersResponse } from '$lib/server/db.types';
 import { throwZodStylePbError, zodForm } from '$lib/server/forms';
 import { fail, redirect, type Cookies } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { escape, omit } from 'lodash-es';
 import type { RecordAuthResponse } from 'pocketbase';
 import { z } from 'zod';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions } from './$types';
 
-export const load = (async ({ params, cookies }) => {
+export const load = async ({ params, cookies, locals }) => {
 	const state = {
 		authenticated: false,
-		token: null
+		user: locals.user
 	};
 
 	try {
-		const token = jwt.verify(
-			cookies.get(import.meta.env.VITE_COOKIE_NAME),
-			import.meta.env.VITE_JWT_SECRET
-		);
-		state.user = token.data.user;
+		jwt.verify(cookies.get(import.meta.env.VITE_COOKIE_NAME), import.meta.env.VITE_JWT_SECRET);
 		state.authenticated = true;
 	} catch (e) {
 		console.error(e);
 	}
 
 	return state;
-}) satisfies PageServerLoad;
+};
 
 function createJwt(user: RecordAuthResponse<UsersRecord>) {
 	return jwt.sign(
@@ -52,7 +48,7 @@ function handleLoginReturn(cookies) {
 async function setCookie(
 	cookies: Cookies,
 	data: { email: string; password: string }
-): Promise<RecordAuthResponse<UsersResponse>> {
+): Promise<UsersResponse> {
 	const user = await pb
 		.collection('users')
 		.authWithPassword<UsersResponse>(data.email, data.password)
@@ -65,7 +61,7 @@ async function setCookie(
 		secure: !import.meta.hot
 	});
 
-	return user;
+	return user.record;
 }
 
 export const actions: Actions = {
@@ -108,7 +104,7 @@ export const actions: Actions = {
 				.create<UsersResponse>({
 					...omit(data, 'household'),
 					passwordConfirm: data.password,
-					emailVisibility: true,
+					emailVisibility: true
 				})
 				.catch(throwZodStylePbError);
 
@@ -116,12 +112,12 @@ export const actions: Actions = {
 
 			const household = await pb
 				.collection('households')
-				.create({ name: data.household, admins: [user.record.id] })
+				.create<HouseholdsResponse>({ name: data.household, admins: [user.id] })
 				.catch(throwZodStylePbError);
 
 			await pb
 				.collection('users')
-				.update(user.record.id, { defaultHousehold: household.id, households: [household.id] })
+				.update(user.id, { defaultHousehold: household.id, households: [household.id] })
 				.catch(throwZodStylePbError);
 
 			await pb.collection('users').requestVerification(data.email);
@@ -132,5 +128,6 @@ export const actions: Actions = {
 				error
 			});
 		}
+		return handleLoginReturn(cookies);
 	}
 };

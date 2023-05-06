@@ -15,7 +15,7 @@
 			<!-- {#if user}<li><a href="/generate">Generate Codes</a></li>{/if} -->
 		</ul>
 		<ul>
-			<li><a href="/user" role="link">{user?.record?.name ?? 'Login'}</a></li>
+			<li><a href="/user" role="link">{user?.name ?? 'Login'}</a></li>
 		</ul>
 	</nav>
 	<!-- <div class="page"> -->
