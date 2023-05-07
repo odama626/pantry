@@ -10,13 +10,13 @@
 		<article>
 			<div>
 			{household.name}
-			<a>Edit</a>
+			<a href="/households/{household.id}">Edit</a>
 			</div>
 			<div>
 			
 			</div>
 			<div>
-			<a>Default Pantry</a>
+			<a>Make Default Pantry</a>
 			<a>Create invite link</a>
 			</div>
 		</article>

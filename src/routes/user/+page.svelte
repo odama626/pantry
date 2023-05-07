@@ -26,6 +26,12 @@
 						instead!
 						<strong>Registering</strong> will create a <strong>new household!</strong>
 					</blockquote>
+					<Input
+						label="Name"
+						name="name"
+						error={getError('name')}
+						value={form?.fields?.name ?? ''}
+					/>
 				{/if}
 				<Input
 					label="Email"
@@ -35,12 +41,6 @@
 				/>
 				<Input label="Password" error={getError('password')} name="password" type="password" />
 				{#if type === 'register'}
-					<Input
-						label="Name"
-						name="name"
-						error={getError('name')}
-						value={form?.fields?.name ?? ''}
-					/>
 					<Input
 						label="House Nickname"
 						description="Home, Lake House, etc"
