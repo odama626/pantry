@@ -10,4 +10,3 @@ export async function load() {
 
 	return exportListResult(households);
 }
-

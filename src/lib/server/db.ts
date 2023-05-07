@@ -94,7 +94,8 @@ export async function prepareItemRecord(item: Record<string, any>) {
 
 export function exportRecord(record, map = {}, field?: string) {
 	if (Array.isArray(record)) return record.map((value) => exportRecord(value, map, field));
-	let result = record.export();
+	let result = record?.export?.() ?? record;
+
 	if (field && map[field]) result = map[field](result);
 
 	Object.entries(result.expand).forEach(([field, value]) => {

@@ -7,8 +7,18 @@
 <main class="container page">
 	<h1>Households</h1>
 	{#each data.items as household}
-		<div>
+		<article>
+			<div>
 			{household.name}
-		</div>
+			<a>Edit</a>
+			</div>
+			<div>
+			
+			</div>
+			<div>
+			<a>Default Pantry</a>
+			<a>Create invite link</a>
+			</div>
+		</article>
 	{/each}
 </main>
