@@ -29,7 +29,7 @@
 		</dialog>
 
 		<ul>
-			{#if $$slots['header-write']}
+			{#if $$slots['header-right']}
 				<slot name="header-right" />
 			{/if}
 			<li>

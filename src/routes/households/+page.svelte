@@ -3,24 +3,37 @@
 
 	export let data;
 
+	const { user } = data;
+
+	console.log({ data });
 </script>
 
 <SlottedLayout>
 	<ul slot="header-right">
-		<li><button class='link'>Create new Household</button><li>
+		<li><button class="link">Create new Household</button></li>
+		<li />
 	</ul>
 	<h1>Households</h1>
 	{#each data.items as household}
 		<article>
-			<div>
+			<div class="flex">
 				{household.name}
 				<a href="/households/{household.id}">Edit</a>
 			</div>
 			<div />
-			<div>
-				<a>Make Default Pantry</a>
+			<div class="flex">
+				{#if user.defaultHousehold === household.id}
+					Default Household
+				{:else} <a>Make Default Pantry</a>{/if}
 				<a>Create invite link</a>
 			</div>
 		</article>
 	{/each}
 </SlottedLayout>
+
+<style lang="scss">
+	.flex {
+		display: flex;
+		justify-content: space-between;
+	}
+</style>
