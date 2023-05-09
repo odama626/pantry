@@ -17,13 +17,25 @@
 		</ul>
 		<ul />
 
+		<dialog>
+			<article>
+				<h3>Invite</h3>
+				<p />
+				<footer>
+					<button>Cancel</button>
+					<button>Invite</button>
+				</footer>
+			</article>
+		</dialog>
+
 		<ul>
-		<slot name="header-right" />
+			{#if $$slots['header-write']}
+				<slot name="header-right" />
+			{/if}
 			<li>
 				<details role="list" dir="rtl">
 					<summary aria-haspopup="listbox" class="overflow-menu" role="link"><KebabIcon /></summary>
 					<ul role="listbox">
-						<li><a href="/user" role="link">{user?.name ?? 'Login'}</a></li>
 						<li><a>Invite To Househould</a></li>
 						<li>
 							<a class="generate" href="/generate"> Print Codes </a>
@@ -31,24 +43,28 @@
 						<li>
 							<a href="/code/clear"> Clean up </a>
 						</li>
+						<hr />
+						<li><a href="/user" role="link">{user?.name ?? 'Login'}</a></li>
 					</ul>
 				</details>
 			</li>
 		</ul>
 	</nav>
-	<!-- <div class="page"> -->
 	<main class="container page">
 		<slot />
 	</main>
 
-	<div class='sidebar'>
-		<slot name='sidebar' />
-	</div>
+	{#if $$slots.sidebar}
+		<div class="sidebar">
+			<slot name="sidebar" />
+		</div>
+	{/if}
 
-	<div class='actions'>
-		<slot name='actions' />
-	</div>
-	<!-- </div> -->
+	{#if $$slots.actions}
+		<div class="actions">
+			<slot name="actions" />
+		</div>
+	{/if}
 </div>
 
 <style lang="scss">

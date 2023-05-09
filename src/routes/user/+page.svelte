@@ -4,6 +4,7 @@
 	import { capitalize } from 'lodash-es';
 	import type { ActionData, PageData } from './$types';
 	import Account from './account.svelte';
+	import SlottedLayout from '$lib/slotted-layout.svelte';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -15,7 +16,7 @@
 	}
 </script>
 
-<main class="container page">
+<SlottedLayout>
 	<section>
 		{#if !data.authenticated}
 			<form method="post" action="?/{type}">
@@ -66,4 +67,4 @@
 			<Account user={data?.user} />
 		{/if}
 	</section>
-</main>
+</SlottedLayout>

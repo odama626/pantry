@@ -6,7 +6,5 @@ export async function load() {
 		.collection('households')
 		.getList<HouseholdsResponse>(0, 20, { expand: 'users(defaultHousehold)' });
 
-	console.dir({ households }, { depth: 5});
-
 	return exportListResult(households);
 }

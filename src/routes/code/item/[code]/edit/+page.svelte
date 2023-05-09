@@ -3,6 +3,7 @@
 	import hashColor from '$lib/hashColor.js';
 	import Image from '$lib/image.svelte';
 	import type { TagsRecord, TagsResponse } from '$lib/server/db.types.js';
+	import SlottedLayout from '$lib/slotted-layout.svelte';
 	import { debounce } from 'lodash-es';
 	import type { ListResult } from 'pocketbase';
 	import Typeahead from 'svelte-typeahead';
@@ -33,7 +34,7 @@
 	}
 </script>
 
-<main class="container page">
+<SlottedLayout>
 	<section>
 		<form method="post" action="/code/item?/edit">
 			<div class="description">
@@ -121,7 +122,7 @@
 			</div>
 		</form>
 	</section>
-</main>
+</SlottedLayout>
 
 <style lang="scss">
 	.description {

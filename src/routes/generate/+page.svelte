@@ -1,4 +1,5 @@
 <script lang="ts">
+	import SlottedLayout from '$lib/slotted-layout.svelte';
 	import { nanoid } from 'nanoid';
 
 	import QRCode from 'qrcode';
@@ -14,18 +15,18 @@
 	);
 </script>
 
-<div>
+<SlottedLayout>
 	<section>
 		{#await codesPromise then codes}
 			{#each codes as code}
-				<img class='code' src={code} />
+				<img class="code" src={code} />
 			{/each}
 		{/await}
 	</section>
-</div>
+</SlottedLayout>
 
 <style lang="scss">
-  .code {
-    width: 90pt;
-  }
+	.code {
+		width: 90pt;
+	}
 </style>

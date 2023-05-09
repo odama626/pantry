@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { EventEmitter } from '$lib/eventEmitter';
+	import SlottedLayout from '$lib/slotted-layout.svelte';
 	import QrScanner from 'qr-scanner';
 	import { onMount } from 'svelte';
 
@@ -52,7 +53,7 @@
 	});
 </script>
 
-<div class="page">
+<SlottedLayout>
 	<div bind:this={overlayElement} />
 	<div class="container">
 		<h1>Cleaning up</h1>
@@ -68,7 +69,7 @@
 			{/each}
 		</div>
 	</div>
-</div>
+</SlottedLayout>
 
 <style lang="scss">
 	.bottom {

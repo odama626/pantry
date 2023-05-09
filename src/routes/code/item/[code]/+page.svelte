@@ -4,13 +4,14 @@
 	import Image from '$lib/image.svelte';
 	import Tag from '$lib/tag.svelte';
 	import { getIcon } from '$lib/getIcon';
+	import SlottedLayout from '$lib/slotted-layout.svelte';
 
 	export let data;
 	const icon = getIcon(data);
 </script>
 
-<main class="container page">
-	<section>
+<SlottedLayout>
+<section>
 		{#if data?.name}
 			<div class="description">
 				<div class="image">
@@ -46,7 +47,7 @@
 			/>
 		</svg> Scan another Code
 	</a>
-</main>
+</SlottedLayout>
 
 <style lang="scss">
 	.description {
