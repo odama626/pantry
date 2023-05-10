@@ -24,7 +24,9 @@
 			<div class="flex">
 				{#if user.defaultHousehold === household.id}
 					Default Household
-				{:else} <a>Make Default Pantry</a>{/if}
+				{:else}
+					<a>Make Default Pantry</a>
+				{/if}
 				<a>Create invite link</a>
 			</div>
 		</article>
