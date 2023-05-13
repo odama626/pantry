@@ -9,7 +9,7 @@ const nounProject = new NounProject({
 	secret: import.meta.env.VITE_NOUN_SECRET
 });
 
-function getIcon(term: string): Promise<string> {
+export function getIcon(term: string): Promise<string> {
 	return new Promise((resolve, reject) =>
 		nounProject.getIconsByTerm(term, { limit: 50 }, (err, data) => {
 			if (err) return reject(err);

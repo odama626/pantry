@@ -22,7 +22,7 @@
 	<section>
 		<div class="description">
 			<div class="image">
-				<Image url={household.imageUrl} />
+				<Image url={household.image} />
 			</div>
 			<div class="detail">
 				<h1>{household.name}</h1>
