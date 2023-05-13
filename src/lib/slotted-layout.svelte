@@ -36,7 +36,7 @@
 				<details role="list" dir="rtl">
 					<summary aria-haspopup="listbox" class="overflow-menu" role="link"><KebabIcon /></summary>
 					<ul role="listbox">
-						<li><a>Invite To Househould</a></li>
+						<li><a href='/households'>Households</a></li>
 						<li>
 							<a class="generate" href="/generate"> Print Codes </a>
 						</li>
