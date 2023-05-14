@@ -1,16 +1,14 @@
 <script lang="ts">
+	import { pb } from '$lib/api.js';
 	import hashColor from '$lib/hashColor.js';
 	import Image from '$lib/image.svelte';
 	import SlottedLayout from '$lib/slotted-layout.svelte';
 	import { Toast } from '$lib/toast';
 	import { nanoid } from 'nanoid';
-	import PocketBase from 'pocketbase';
 
-	const pb = new PocketBase(import.meta.env.VITE_PB_DOMAIN);
 
 	export let data;
 	pb.authStore.save(data?.token, data?.user);
-	console.log(pb.authStore.isValid);
 	const { household, members } = data;
 
 	async function createInvite() {
