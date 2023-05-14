@@ -12,7 +12,8 @@ export const handle = (async ({ event, resolve }) => {
 		pb.authStore.save(token?.user?.token, token?.user?.record);
 
 		event.locals.user = token?.user?.record;
-		
+		event.locals.token = token?.user?.token;
+
 		if (!pb.authStore.isValid) throw new Error('Unathenticated');
 	} catch (e) {
 		console.error(e);

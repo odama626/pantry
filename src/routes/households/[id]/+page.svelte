@@ -2,10 +2,40 @@
 	import hashColor from '$lib/hashColor.js';
 	import Image from '$lib/image.svelte';
 	import SlottedLayout from '$lib/slotted-layout.svelte';
+	import { Toast } from '$lib/toast';
+	import { nanoid } from 'nanoid';
+	import PocketBase from 'pocketbase';
+
+	const pb = new PocketBase(import.meta.env.VITE_PB_DOMAIN);
 
 	export let data;
-
+	pb.authStore.save(data?.token, data?.user);
+	console.log(pb.authStore.isValid);
 	const { household, members } = data;
+
+	async function createInvite() {
+		const toastId = Toast.push({ text: `Creating Share link` });
+		const code = nanoid(10);
+
+		const inviteData = {
+			household: household.id,
+			code,
+			invited_by: data.user.id
+		};
+
+		console.log({ inviteData });
+
+		const invite = await pb.collection('invites').create(inviteData);
+
+		Toast.dismiss(toastId);
+		const url = new URL(`/invite`, window.location.href);
+		url.searchParams.set('code', invite.code);
+		url.searchParams.set('id', invite.id);
+		navigator.clipboard.writeText(url.toString())
+		Toast.push('Invite Copied to clipboard');
+
+		console.log({ invite });
+	}
 
 	function getUserInitials(username: string) {
 		return username
@@ -35,7 +65,7 @@
 						</div>
 					{/each}
 					<div class="footer">
-						<button class="link">Create Invite Link</button>
+						<button class="link" on:click={createInvite}>Create Invite Link</button>
 					</div>
 				</div>
 			</div>

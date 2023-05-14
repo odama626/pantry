@@ -4,6 +4,7 @@
 	import '$lib/theme.scss';
 	import '$lib/pico-extras.scss';
 	import KebabIcon from '$lib/icons/kebab.svelte';
+	import Toast from './toast.svelte';
 
 	const user = $page?.data?.user;
 </script>
@@ -36,7 +37,7 @@
 				<details role="list" dir="rtl">
 					<summary aria-haspopup="listbox" class="overflow-menu" role="link"><KebabIcon /></summary>
 					<ul role="listbox">
-						<li><a href='/households'>Households</a></li>
+						<li><a href="/households">Households</a></li>
 						<li>
 							<a class="generate" href="/generate"> Print Codes </a>
 						</li>
@@ -52,6 +53,7 @@
 	</nav>
 	<main class="container page">
 		<slot />
+		<Toast />
 	</main>
 
 	{#if $$slots.sidebar}
